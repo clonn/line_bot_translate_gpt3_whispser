@@ -14,6 +14,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 const channelAccessToken = process.env.CHANNEL_ACCESS_TOKEN;
+const WHSIPER_API = process.env.WHSIPER_API;
 // 設定 Line Bot API 的 Channel Secret 和 Channel Access Token
 const bot = linebot({
   channelId: process.env.CHANNEL_ID,
@@ -118,7 +119,7 @@ bot.on('message', async event => {
       let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'http://127.0.0.1:9000/detect-language',
+        url: `${WHSIPER_API}/detect-language`,
         headers: { 
           ...formData.getHeaders()
         },
@@ -142,7 +143,7 @@ bot.on('message', async event => {
       config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'http://127.0.0.1:9000/asr',
+        url: `${WHSIPER_API}/asr`,
         headers: { 
           ...formData.getHeaders()
         },
