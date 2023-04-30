@@ -6,13 +6,14 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
+require('dotenv').config();
 const { Configuration, OpenAIApi } = require("openai");
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-
+const channelAccessToken = process.env.CHANNEL_ACCESS_TOKEN;
 // 設定 Line Bot API 的 Channel Secret 和 Channel Access Token
 const bot = linebot({
   channelId: process.env.CHANNEL_ID,
@@ -42,7 +43,7 @@ async function getTranslateByOpenAI (
             you r a translator pro,
             only translate user text
             translate from ${source} to ${target},
-            return json format {zh, id}
+            only reply to me the result as json format {zh, id}
           `
         },
         {
