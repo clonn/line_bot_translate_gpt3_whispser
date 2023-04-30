@@ -93,9 +93,12 @@ const writeFileAsync = promisify(fs.writeFile);
 
 bot.on('message', async event => {
   console.log(event);
-  // if (event.message.type === 'text') {
+  if (event.message.type === 'text') {
+    if (event.message.text ==='test') {
+      await event.reply(`test: ${event.message.text}`);    
+    }
   //   await event.reply(`test: ${event.message.text}`);
-  // }
+  }
   if (event.message.type === 'audio') {
     try {
 
