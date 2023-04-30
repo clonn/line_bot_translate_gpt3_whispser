@@ -43,7 +43,7 @@ async function getTranslateByOpenAI (
             you r a translator pro,
             only translate user text
             translate from ${source} to ${target},
-            only reply to me the result as json format {zh, id}
+            only reply to me the result as json format { target : "translated_content" }
           `
         },
         {
@@ -54,7 +54,17 @@ async function getTranslateByOpenAI (
     });
     console.log(completion.data);
     console.log(completion.data.choices[0].message.content);
-    return completion.data.choices[0].message.content || false;
+    const str = completion.data.choices[0].message.content;
+    const regex = /{.*?}/s; // a regular expression to match the JSON object string
+    const matches = str.match(regex); // an array of matches found in the input string
+    if (matches && matches.length > 0) {
+      const jsonStr = matches[0]; // extract the first match (which should be the JSON object string)
+      return jsonStr
+      // const jsonObject = JSON.parse(jsonStr); // parse the JSON object string into a JavaScript object
+      // console.log(jsonObject); // output: {"zh": "你什么时候会需要会请给你的小孩", "id": "Kapan kamu akan membutuhkannya untuk meminta anakmu"}
+    } else {
+      return false;
+    }
 }
 
 const app = express();
@@ -158,22 +168,17 @@ bot.on('message', async event => {
       console.log(translatedObj);
       console.log(typeof translatedObj);
       let translatedData = {
-        zh: '翻譯失敗',
-        id: 'terjemahan gagal',
+        target: '翻譯失敗',
       };
       try {
-        const buffer = JSON.parse(translatedObj);
-        translatedData = {
-          zh: buffer.zh,
-          id: buffer.id,
-        };
+        translatedData = JSON.parse(translatedObj);
       } catch (error) {
         console.log('format type error');
         await event.reply(`Translate failed`);
         return;
       }
       const origin = responseText.data;
-      const translated = translatedData[isZH(detectedLanguage) ? 'id': 'zh'];
+      const translated = translatedData.target;
       // 回覆轉換後的文字訊息
       await event.reply([  
         {type:'text', text:`origin: ${origin}`},
