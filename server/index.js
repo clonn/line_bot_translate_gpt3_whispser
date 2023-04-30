@@ -15,6 +15,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 const channelAccessToken = process.env.CHANNEL_ACCESS_TOKEN;
 const WHSIPER_API = process.env.WHSIPER_API;
+console.log('WHSIPER_API', WHSIPER_API);
 // 設定 Line Bot API 的 Channel Secret 和 Channel Access Token
 const bot = linebot({
   channelId: process.env.CHANNEL_ID,
@@ -81,15 +82,20 @@ app.post('/webhook', (req, res) => {
   res.sendStatus(200);
 });
 
+app.get('/', (req, res) => {
+  // console.log(req);
+  return res.end('ok');
+});
+
 // 處理 Line Bot 收到的訊息事件
 
 const writeFileAsync = promisify(fs.writeFile);
 
 bot.on('message', async event => {
   console.log(event);
-  // if (event.message.type === 'text') {
-  //   await event.reply(`test: ${event.message.text}`);
-  // }
+  if (event.message.type === 'text') {
+    await event.reply(`test: ${event.message.text}`);
+  }
   if (event.message.type === 'audio') {
     try {
 
@@ -131,8 +137,8 @@ bot.on('message', async event => {
       // Handle the response from the server
       console.log('API response:', response.data);
       // { detected_language: 'chinese', language_code: 'zh' }
-      console.log('Detected language:', response.data.langauge_code);
-      const detectedLanguage = response.data.langauge_code;
+      console.log('Detected language:', response.data.language_code);
+      const detectedLanguage = response.data.language_code;
 
       formData = new FormData();
       formData.append('audio_file', fs.createReadStream(audioFilePath));
@@ -150,7 +156,7 @@ bot.on('message', async event => {
         data : formData
       };
 
-      console.log(config);
+      // console.log(config);
       const responseText = await axios.request(config)
       console.log(responseText);
 
